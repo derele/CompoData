@@ -62,8 +62,6 @@ n <- 3 ## number of rows
 m <- 3 ## number of columns
 
 means <- c(3, 28, 330) ## per row (species) mean
-depth <- c(0.1, 1, 0.2) ## per column (planet) depth
-mu <- as.matrix(means)%*%t(as.matrix(depth))
 
 set.seed(1209)
 countData <- matrix(rnbinom(m * n, mu = means, size = 10), 
@@ -79,37 +77,28 @@ ggplot(melt(countData),
 ```
 
 
-
-```{r}
-## set.seed(1209)
-
-## n <- 3 ## number of rows
-## m <- 3 ## number of columns
-## interceptMean <- 8
-## interceptSD <- 3
-## sizeFactors <- c(0.2, 1, 0.1)
-    
-## beta <- rnorm(n, interceptMean, interceptSD)
-
-## ## we make the dispersion related to a mean
-## dispMeanRel <- function(x) 4/x + 0.1 ## dispersion mean relationship
-## dispersion <- dispMeanRel(2^beta)
-
-## mu <- 2^beta*sizeFactors
-
-## countData <- matrix(rnbinom(m * n, mu = mu, size = 1/dispersion), 
-##                     ncol = m)
-## colnames(countData) <- c("venus", "earth", "mars")
-## rownames(countData) <- c("tigers", "unicorns", "ladybugs")
-
-```
-
-
 In addition our sampling of the starting molecules usually varies in
 depth. A usual first step in all analyses is to account for this
 variation in sampling depths. Standard (presented below) methods
 don't consider the compositional nature of sequencing data when dong
 so.
+
+
+```{r, fig.show='hold', fig.height=4, fig.width=4}
+depth <- c(1, 0.1, 0.5) ## per column (planet) depth
+mu <- as.matrix(means)%*%t(as.matrix(depth))
+
+countData <- matrix(rnbinom(m * n, mu = mu, size = 10), 
+                   ncol = m)
+colnames(countData) <- c("venus", "earth", "mars")
+rownames(countData) <- c("tigers", "unicorns", "ladybugs")
+
+ggplot(melt(countData),
+       aes(x=X2, y=value, fill=X1)) +
+    geom_col()
+```
+
+
 
 ## Scaling by totals
 
