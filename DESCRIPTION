@@ -1,0 +1,15 @@
+Package: CompoData
+Type: Package
+Title: A lecture on sequence count data
+Version: 1.0
+Date: 2018-02-12
+Author: Emanuel Heitlinger  <emanuelheitlinger@gmail.com>
+Maintainer: Emanuel Heitlinger <emanuelheitlinger@gmail.com>
+Description: Distribution of a lecture (please see the vignette)
+License: GPL-3
+RoxygenNote: 6.0.1
+Imports:
+    DESeq2
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
