@@ -328,14 +328,17 @@ table(res.deseq$padj<0.01)
 
 ```
 
-
 ## Techniques acknowleding compositionality
 
-Centered log-ratio (clr) transformation offers an alternative
-([e.g. reviewd here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/)). 
+
+### Classical testing for differential abundance
+
+Centered log-ratio (clr) transformation offer an alternative ([see
+here](https://github.com/ggloor/CoDa_microbiome_tutorial/wiki/Before-we-start)).
 
 ```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4, cache=TRUE}
 library(ALDEx2)
+
 g.mean <- function (x, na.rm=TRUE){
     exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
 }
@@ -354,5 +357,34 @@ countData.clrP <- aldex.clr(countData,
 
 res.aldex <- aldex.glm(countData.clrP, conditions=colData$planet)
 ```
+
+The problem here is that the neither the geometric mean nor the log
+can be calculated for zero-count samples. After our naive solution
+(adding a small number) we used a package which "converts the single
+estimate to a probability vector". This uses Monte-Carlo sampling from
+the Dirichlet distribution
+([ref](https://doi.org/10.17713/ajs.v45i4.122 )).
+
+```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4}
+res <- merge(res.aldex, as.data.frame(res.deseq), by=0)
+
+ggplot(res, aes(glm.eBH, padj)) +
+    geom_point() +
+    scale_y_log10() +
+    scale_x_log10()
+
+```
+
+The p-values from very established negative-binomial glm (using
+scaling as an offset parameter) are highly corrlated. The
+compositional approach is a bit more conservative in the
+multiple-testing adjusted p-values. 
+
+
+### So what could it be good for
+
+MY guess: correlation between samples 
+
+
 
 > To be continued.

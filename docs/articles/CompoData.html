@@ -320,8 +320,12 @@ res.deseq &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 <div id="techniques-acknowleding-compositionality" class="section level2">
 <h2 class="hasAnchor">
 <a href="#techniques-acknowleding-compositionality" class="anchor"></a>Techniques acknowleding compositionality</h2>
-<p>Centered log-ratio (clr) transformation offers an alternative (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/">e.g. reviewd here</a>).</p>
+<div id="classical-testing-for-differential-abundance" class="section level3">
+<h3 class="hasAnchor">
+<a href="#classical-testing-for-differential-abundance" class="anchor"></a>Classical testing for differential abundance</h3>
+<p>Centered log-ratio (clr) transformation offer an alternative (<a href="https://github.com/ggloor/CoDa_microbiome_tutorial/wiki/Before-we-start">see here</a>).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ALDEx2)
+
 g.mean &lt;-<span class="st"> </span>function (x, <span class="dt">na.rm=</span><span class="ot">TRUE</span>){
     <span class="kw">exp</span>(<span class="kw">sum</span>(<span class="kw">log</span>(x[x &gt;<span class="st"> </span><span class="dv">0</span>]), <span class="dt">na.rm=</span>na.rm) /<span class="st"> </span><span class="kw">length</span>(x))
 }
@@ -345,9 +349,25 @@ res.aldex &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 <span class="co">#&gt; [1] "running tests for each MC instance:"</span>
 <span class="co">#&gt; |------------(25%)----------(50%)----------(75%)----------|</span></code></pre></div>
 <p><img src="CompoData_files/figure-html/unnamed-chunk-8-1.png" width="384"></p>
+<p>The problem here is that the neither the geometric mean nor the log can be calculated for zero-count samples. After our naive solution (adding a small number) we used a package which “converts the single estimate to a probability vector”. This uses Monte-Carlo sampling from the Dirichlet distribution (<a href="https://doi.org/10.17713/ajs.v45i4.122">ref</a>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res &lt;-<span class="st"> </span><span class="kw">merge</span>(res.aldex, <span class="kw">as.data.frame</span>(res.deseq), <span class="dt">by=</span><span class="dv">0</span>)
+
+<span class="kw">ggplot</span>(res, <span class="kw">aes</span>(glm.eBH, padj)) +
+<span class="st">    </span><span class="kw">geom_point</span>() +
+<span class="st">    </span><span class="kw">scale_y_log10</span>() +
+<span class="st">    </span><span class="kw">scale_x_log10</span>()
+<span class="co">#&gt; Warning: Removed 41 rows containing missing values (geom_point).</span></code></pre></div>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-9-1.png" width="384"></p>
+<p>The p-values from very established negative-binomial glm (using scaling as an offset parameter) are highly corrlated. The compositional approach is a bit more conservative in the multiple-testing adjusted p-values.</p>
+</div>
+<div id="so-what-could-it-be-good-for" class="section level3">
+<h3 class="hasAnchor">
+<a href="#so-what-could-it-be-good-for" class="anchor"></a>So what could it be good for</h3>
+<p>MY guess: correlation between samples</p>
 <blockquote>
 <p>To be continued.</p>
 </blockquote>
+</div>
 </div>
 </div>
 </div>

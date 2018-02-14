@@ -7,3 +7,6 @@ inst/doc
 /.Rbuildignore
 /README.md~
 *_cache
+/vignettes/CompoData_files/figure-html/unnamed-chunk-9-1.png
+/vignettes/CompoData.html
+/vignettes/CompoData.R
