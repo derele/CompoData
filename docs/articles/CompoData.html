@@ -70,16 +70,19 @@
 <a href="#e-g-in-microbiomes-or-transcriptomes" class="anchor"></a>(e.g. in microbiomes or transcriptomes)</h2>
 <p>Standard analyses of abundance estimates genereated from sequencing treat the generated data as counts. Methods for differential abundance estimation in RNAseq data have probably recieved most attention in this regard (<a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">see e.g. this for one of the current approaches</a>). Many (if not all) of the methods developed for analyses of count data derived from transcriptomes are also applied to amplicon sequencing data. On the other hand techniques from classical community ecolgy are applied on data from transcriptomics or amplicon sequencing alike (mostly after <em>transforming</em> it to count data).</p>
 <p>In the field of amplicon sequencing there are currently concernes that analysis of “compositional data” as counts can introduce biases (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/">e.g. reviewd here</a>, refering in its core to <a href="https://www.amazon.de/Statistical-Compositional-Monographs-Statistics-Probability/dp/0412280604">Aitchison, J. (1986)</a>).</p>
-<p>This document aims to give an introduction to the challenges posed by compositional data produced to assess transcriptomes or microbiomes. I will give an “abstract” introduction into:</p>
+<p>This document aims to give an introduction to the challenges that are posed by compositional data produced to assess transcriptomes via RNAseq or microbiomes via amplicon sequencing. I will give an “abstract” introduction into:</p>
 <ol style="list-style-type: decimal">
 <li>pecularities of “compositional count data” from sequencing,</li>
 </ol>
 <p>and show</p>
 <ol start="2" style="list-style-type: decimal">
-<li>how analyses of community ecology (try to) deal with these.</li>
+<li>how analyses of community ecology (try to) deal with these (or not).</li>
 </ol>
-<p>The main purpose is to discuss with the audience how concepts in community ecology and data analyses are affected by the nature of sequencing data.</p>
-<p>It is distributed and “developed” as a package to ease further expansion and contribution</p>
+<p>The main purpose is to discuss with the audience how concepts in community ecology and data analyses are affected by the nature of sequencing data and I want to discuss</p>
+<ol start="3" style="list-style-type: decimal">
+<li>whether it is even conceptually possible to address these issues using generic solutions.</li>
+</ol>
+<p>This is distributed and “developed” as a package to ease further expansion and contribution.</p>
 </div>
 <div id="so-what-is-this-compositional-data" class="section level2">
 <h2 class="hasAnchor">
@@ -106,8 +109,9 @@ countData &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span cla
 <span class="kw">ggplot</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/reshape/topics/melt-24">melt</a></span>(countData),
        <span class="kw">aes</span>(<span class="dt">x=</span>X2, <span class="dt">y=</span>value, <span class="dt">fill=</span>X1)) +
 <span class="st">    </span><span class="kw">geom_col</span>()</code></pre></div>
-<p><img src="CompoData_files/figure-html/unnamed-chunk-2-1.png" width="384"></p>
-<p>In addition our sampling of the starting molecules usually varies in depth. A usual first step in all analyses is to account for this variation in sampling depths. Standard (presented below) methods don’t consider the compositional nature of sequencing data when dong so.</p>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-1-1.png" width="384"></p>
+<p>These values (given how we simulated them) could now be the actual counts of our animals on those planets. The problem is: when sequencing we don’t know. PCRs in the preparation of libraries (collections of DNA molecules) perserve the relative proportions of different molecules (say those from tigers, unicorns and ladybugs) but provide no information on the number before amplification.</p>
+<p>In addition, our sampling of the finally produced molecules usually varies in depth (that is sequencing depth varies). A usual first step in all analyses is to account for this variation in sampling depths. Standard (presented below) methods don’t consider the compositional nature of sequencing data when dong so.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">depth &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>) ## per column (planet) depth
 mu &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(means)%*%<span class="kw">t</span>(<span class="kw">as.matrix</span>(depth))
 
@@ -119,7 +123,7 @@ countData &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span cla
 <span class="kw">ggplot</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/reshape/topics/melt-24">melt</a></span>(countData),
        <span class="kw">aes</span>(<span class="dt">x=</span>X2, <span class="dt">y=</span>value, <span class="dt">fill=</span>X1)) +
 <span class="st">    </span><span class="kw">geom_col</span>()</code></pre></div>
-<p><img src="CompoData_files/figure-html/unnamed-chunk-3-1.png" width="384"></p>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-2-1.png" width="384"></p>
 </div>
 <div id="scaling-by-totals-1" class="section level2">
 <h2 class="hasAnchor">
@@ -130,12 +134,12 @@ countData &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span cla
 <span class="kw">ggplot</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/reshape/topics/melt-24">melt</a></span>(<span class="kw">t</span>(<span class="kw">t</span>(countData)*<span class="dv">1</span>/scaling.factor)),
        <span class="kw">aes</span>(<span class="dt">x=</span>X2, <span class="dt">y=</span>value, <span class="dt">fill=</span>X1)) +
 <span class="st">    </span><span class="kw">geom_col</span>()</code></pre></div>
-<p><img src="CompoData_files/figure-html/unnamed-chunk-4-1.png" width="384"></p>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-3-1.png" width="384"></p>
 </div>
 <div id="interlude-a-more-realistic-dataset" class="section level2">
 <h2 class="hasAnchor">
 <a href="#interlude-a-more-realistic-dataset" class="anchor"></a>Interlude: A more realistic dataset</h2>
-<p>We adjust a couple of things in our dataset to make it more realistic:</p>
+<p>We now adjust a couple of things in our dataset to make it more realistic:</p>
 <ol style="list-style-type: decimal">
 <li><p>We add more species (rows, could also be genes in trascriptomics)</p></li>
 <li><p>We add more samples (columns) and also specify them as replicates for our differnt ecosystmes (could be tissues or treatments in transcriptomics)</p></li>
@@ -198,7 +202,8 @@ countData &lt;-<span class="st"> </span>countData[<span class="kw">rowSums</span
          <span class="dt">annotation_col=</span>colData,
          <span class="dt">show_rownames=</span><span class="ot">FALSE</span>,
          <span class="dt">show_colnames=</span><span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="CompoData_files/figure-html/unnamed-chunk-5-1.png" width="384"></p>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-4-1.png" width="384"></p>
+<p>I aimed for a simulation of a dataset which resembles more amplicon sequencing as compred to RNAseq. These datasets are usually sparse, meaning many species have in many samples zero counts. Mean values of a negative binomial distribution for individual species are themselfs normally distributed. These mean values are low but have a high variance. To differenciate the different ecosystems I used differences in the mean which are normally distibuted with a mean of zero.</p>
 </div>
 <div id="scaling-by-totals-2-slightly-more-realistic-data" class="section level2">
 <h2 class="hasAnchor">
@@ -218,8 +223,9 @@ countData.scaled &lt;-<span class="st"> </span><span class="kw">t</span>(<span c
          <span class="dt">annotation_col=</span>colData,
          <span class="dt">show_rownames=</span><span class="ot">FALSE</span>,
          <span class="dt">show_colnames=</span><span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="CompoData_files/figure-html/unnamed-chunk-6-1.png" width="384"><img src="CompoData_files/figure-html/unnamed-chunk-6-2.png" width="384"></p>
-<p>Interestingly, scaleing by totals seems to screw us over here. We did not include sequencing depth differnences in this simulation, so we know we wouldn’t have needed to scale. In real data we don’t know this and we have to correct for the differences in sequencing depths.</p>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-5-1.png" width="384"><img src="CompoData_files/figure-html/unnamed-chunk-5-2.png" width="384"></p>
+<p>This lead to a dataset in which the total number of animals varied a lot. A situation which should be challenging when the data is “normalized”.</p>
+<p>Interestingly, scaleing by totals seems to screw us over here. We did not include sequencing depth differnences in this simulation, so we know we wouldn’t have needed to scale. But annoyingly the sequencing process itself (or to be more exact the PCR) does “scale” for us. In real data we don’t know all of this and we have to correct for the differences in sequencing depths.</p>
 </div>
 <div id="rarefaction" class="section level2">
 <h2 class="hasAnchor">
@@ -257,13 +263,59 @@ richness &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
 <span class="st">    </span><span class="kw">geom_errorbar</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>richness.mean-richness.sd,
                       <span class="dt">ymax=</span>richness.mean+richness.sd))+
 <span class="st">    </span><span class="kw">facet_wrap</span>(~planet, <span class="dt">scales=</span><span class="st">"free_x"</span>)</code></pre></div>
-<p><img src="CompoData_files/figure-html/unnamed-chunk-7-1.png" width="384"><img src="CompoData_files/figure-html/unnamed-chunk-7-2.png" width="384"></p>
+<p><img src="CompoData_files/figure-html/unnamed-chunk-6-1.png" width="384"><img src="CompoData_files/figure-html/unnamed-chunk-6-2.png" width="384"></p>
 <p>Uh, we are screwed again!</p>
 </div>
 <div id="using-totals-based-scaling-as-offset-for-modelling" class="section level2">
 <h2 class="hasAnchor">
 <a href="#using-totals-based-scaling-as-offset-for-modelling" class="anchor"></a>Using totals based scaling as offset for modelling</h2>
-<p>We will skip this…</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DESeq2)
+
+<span class="kw">mode</span>(countData) &lt;-<span class="st"> "integer"</span>
+
+rowRanges &lt;-<span class="st"> </span><span class="kw">GRanges</span>(<span class="st">"1"</span>, <span class="kw">IRanges</span>(<span class="dt">start =</span> (<span class="dv">1</span>:<span class="kw">nrow</span>(countData) -<span class="st"> </span><span class="dv">1</span>) *<span class="st"> </span><span class="dv">100</span> +<span class="st"> </span><span class="dv">1</span>,
+                                  <span class="dt">width =</span> <span class="dv">100</span>))
+
+dds &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/DESeqDataSet">DESeqDataSetFromMatrix</a></span>(<span class="dt">countData =</span> countData, <span class="dt">colData =</span> colData, 
+                              <span class="dt">design =</span> ~planet, <span class="dt">rowRanges =</span> rowRanges,
+                              <span class="dt">ignoreRank =</span> <span class="ot">TRUE</span>)
+
+dds &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/estimateSizeFactors">estimateSizeFactors</a></span>(dds, <span class="dt">type=</span><span class="st">"poscounts"</span>)
+
+dds &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/estimateDispersions">estimateDispersions</a></span>(dds)
+<span class="co">#&gt; gene-wise dispersion estimates</span>
+<span class="co">#&gt; mean-dispersion relationship</span>
+<span class="co">#&gt; -- note: fitType='parametric', but the dispersion trend was not well captured by the</span>
+<span class="co">#&gt;    function: y = a/x + b, and a local regression fit was automatically substituted.</span>
+<span class="co">#&gt;    specify fitType='local' or 'mean' to avoid this message next time.</span>
+<span class="co">#&gt; final dispersion estimates</span>
+dds &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/nbinomLRT">nbinomLRT</a></span>(dds, <span class="dt">reduced=</span> ~<span class="dv">1</span>)
+res.deseq &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/results">results</a></span>(dds)
+
+<span class="kw">head</span>(res.deseq[<span class="kw">order</span>(res.deseq$padj), ])
+<span class="co">#&gt; log2 fold change (MLE): planet venus vs earth </span>
+<span class="co">#&gt; LRT p-value: '~ planet' vs '~ 1' </span>
+<span class="co">#&gt; DataFrame with 6 rows and 6 columns</span>
+<span class="co">#&gt;              baseMean log2FoldChange     lfcSE      stat       pvalue</span>
+<span class="co">#&gt;             &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;    &lt;numeric&gt;</span>
+<span class="co">#&gt; species_213 94.702455       5.857367 0.6183568 142.25641 1.286512e-31</span>
+<span class="co">#&gt; species_28   3.072630       4.375525 0.6857651 105.53118 1.213936e-23</span>
+<span class="co">#&gt; species_21   5.300482       3.474154 0.5985473  72.24978 2.047194e-16</span>
+<span class="co">#&gt; species_55   7.374460       3.088628 0.5440076  70.40334 5.153587e-16</span>
+<span class="co">#&gt; species_74   4.125340      -4.206402 0.7922348  65.15906 7.093993e-15</span>
+<span class="co">#&gt; species_237  8.332600       3.240092 0.5555765  64.47082 1.000783e-14</span>
+<span class="co">#&gt;                     padj</span>
+<span class="co">#&gt;                &lt;numeric&gt;</span>
+<span class="co">#&gt; species_213 3.293471e-29</span>
+<span class="co">#&gt; species_28  1.553838e-21</span>
+<span class="co">#&gt; species_21  1.746939e-14</span>
+<span class="co">#&gt; species_55  3.298295e-14</span>
+<span class="co">#&gt; species_74  3.632124e-13</span>
+<span class="co">#&gt; species_237 4.270006e-13</span>
+<span class="kw">table</span>(res.deseq$padj&lt;<span class="fl">0.01</span>)
+<span class="co">#&gt; </span>
+<span class="co">#&gt; FALSE  TRUE </span>
+<span class="co">#&gt;   150   106</span></code></pre></div>
 </div>
 <div id="techniques-acknowleding-compositionality" class="section level2">
 <h2 class="hasAnchor">
@@ -286,10 +338,15 @@ countData.clr &lt;-<span class="st"> </span><span class="kw">apply</span>(countD
 countData.clrP &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ALDEx2/topics/aldex.clr.function-methods">aldex.clr</a></span>(countData,
                             <span class="dt">conds=</span><span class="kw">as.character</span>(colData$planet))
 <span class="co">#&gt; [1] "operating in serial mode"</span>
-<span class="co">#&gt; [1] "computing center with all features"</span></code></pre></div>
+<span class="co">#&gt; [1] "computing center with all features"</span>
+
+res.aldex &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ALDEx2/topics/aldex.glm">aldex.glm</a></span>(countData.clrP, <span class="dt">conditions=</span>colData$planet)
+<span class="co">#&gt; [1] "operating in serial mode"</span>
+<span class="co">#&gt; [1] "running tests for each MC instance:"</span>
+<span class="co">#&gt; |------------(25%)----------(50%)----------(75%)----------|</span></code></pre></div>
 <p><img src="CompoData_files/figure-html/unnamed-chunk-8-1.png" width="384"></p>
 <blockquote>
-<p>“He who gives up [code] safety for [code] speed deserves neither.” (<a href="https://twitter.com/hadleywickham/status/504368538874703872">via</a>)</p>
+<p>To be continued.</p>
 </blockquote>
 </div>
 </div>

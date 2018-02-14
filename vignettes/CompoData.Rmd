@@ -13,7 +13,9 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
-)
+  )
+library(ggplot2)
+theme_set(theme_bw())
 ```
 
 # Analysis of compositional count data 
@@ -71,11 +73,6 @@ transcripts) this pool of molecues was generated from
 
 To illustrate we start to simulate some count data (strongly inspired
 by `DESeq2::makeExampleDESeqDataSet`)
-
-```{r, echo=FALSE}
-library(ggplot2)
-theme_set(theme_bw())
-```
 
 
 ```{r, fig.height=4, fig.show='hold', fig.width=4}
@@ -247,12 +244,15 @@ pheatmap(log10(countData.scaled+1),
 ```
 
 This lead to a dataset in which the total number of animals varied a
-lot with the 
+lot. A situation which should be challenging when the data is
+"normalized".
 
 Interestingly, scaleing by totals seems to screw us over here. We did
 not include sequencing depth differnences in this simulation, so we
-know we wouldn't have needed to scale. In real data we don't know this
-and we have to correct for the differences in sequencing depths.
+know we wouldn't have needed to scale. But annoyingly the sequencing
+process itself (or to be more exact the PCR) does "scale" for us.  In
+real data we don't know all of this and we have to correct for the
+differences in sequencing depths.
 
 ## Rarefaction
 
@@ -305,14 +305,36 @@ Uh, we are screwed again!
 
 ## Using totals based scaling as offset for modelling
 
-We will skip this...
+```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4, cache=TRUE}
+library(DESeq2)
+
+mode(countData) <- "integer"
+
+rowRanges <- GRanges("1", IRanges(start = (1:nrow(countData) - 1) * 100 + 1,
+                                  width = 100))
+
+dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, 
+                              design = ~planet, rowRanges = rowRanges,
+                              ignoreRank = TRUE)
+
+dds <- estimateSizeFactors(dds, type="poscounts")
+
+dds <- estimateDispersions(dds)
+dds <- nbinomLRT(dds, reduced= ~1)
+res.deseq <- results(dds)
+
+head(res.deseq[order(res.deseq$padj), ])
+table(res.deseq$padj<0.01)
+
+```
+
 
 ## Techniques acknowleding compositionality
 
 Centered log-ratio (clr) transformation offers an alternative
 ([e.g. reviewd here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/)). 
 
-```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4}
+```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4, cache=TRUE}
 library(ALDEx2)
 g.mean <- function (x, na.rm=TRUE){
     exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
@@ -330,8 +352,7 @@ pheatmap(countData.clr,
 countData.clrP <- aldex.clr(countData,
                             conds=as.character(colData$planet))
 
-
+res.aldex <- aldex.glm(countData.clrP, conditions=colData$planet)
 ```
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+> To be continued.
