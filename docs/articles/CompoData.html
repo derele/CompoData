@@ -62,12 +62,14 @@
     
     
 <div class="contents">
-<div id="analysis-of-compositional-data" class="section level1">
+<div id="analysis-of-compositional-count-data" class="section level1">
 <h1 class="hasAnchor">
-<a href="#analysis-of-compositional-data" class="anchor"></a>Analysis of compositional data</h1>
+<a href="#analysis-of-compositional-count-data" class="anchor"></a>Analysis of compositional count data</h1>
 <div id="e-g-in-microbiomes-or-transcriptomes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#e-g-in-microbiomes-or-transcriptomes" class="anchor"></a>(e.g. in microbiomes or transcriptomes)</h2>
+<p>Standard analyses of abundance estimates genereated from sequencing treat the generated data as counts. Methods for differential abundance estimation in RNAseq data have probably recieved most attention in this regard (<a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">see e.g. this for one of the current approaches</a>). Many (if not all) of the methods developed for analyses of count data derived from transcriptomes are also applied to amplicon sequencing data. On the other hand techniques from classical community ecolgy are applied on data from transcriptomics or amplicon sequencing alike (mostly after <em>transforming</em> it to count data).</p>
+<p>In the field of amplicon sequencing there are currently concernes that analysis of “compositional data” as counts can introduce biases (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/">e.g. reviewd here</a>, refering in its core to <a href="https://www.amazon.de/Statistical-Compositional-Monographs-Statistics-Probability/dp/0412280604">Aitchison, J. (1986)</a>).</p>
 <p>This document aims to give an introduction to the challenges posed by compositional data produced to assess transcriptomes or microbiomes. I will give an “abstract” introduction into:</p>
 <ol style="list-style-type: decimal">
 <li>pecularities of “compositional count data” from sequencing,</li>
@@ -300,7 +302,7 @@ countData.clrP &lt;-<span class="st"> </span><span class="kw"><a href="http://ww
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li>
-<a href="#analysis-of-compositional-data">Analysis of compositional data</a><ul class="nav nav-pills nav-stacked">
+<a href="#analysis-of-compositional-count-data">Analysis of compositional count data</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#e-g-in-microbiomes-or-transcriptomes">(e.g. in microbiomes or transcriptomes)</a></li>
       <li><a href="#so-what-is-this-compositional-data">So what is this “compositional data”?</a></li>
       <li><a href="#scaling-by-totals-1">Scaling by totals (1)</a></li>

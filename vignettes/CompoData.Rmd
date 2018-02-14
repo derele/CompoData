@@ -16,8 +16,22 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Analysis of compositional data 
+# Analysis of compositional count data 
 ## (e.g. in microbiomes or transcriptomes)
+
+Standard analyses of abundance estimates genereated from sequencing
+treat the generated data as counts. Methods for differential abundance
+estimation in RNAseq data have probably recieved most attention in
+this regard
+([see e.g. this for one of the current approaches](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8)). Many
+(if not all) of the methods developed for analyses of count data
+derived from transcriptomes are also applied to amplicon sequencing
+data. On the other hand techniques from classical community ecolgy are
+applied on data from transcriptomics or amplicon sequencing alike
+(mostly after _transforming_ it to count data). 
+
+In the field of amplicon sequencing there are currently concernes that
+analysis of "compositional data" as counts can introduce biases ([e.g. reviewd here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/), refering in its core to [Aitchison, J. (1986)](https://www.amazon.de/Statistical-Compositional-Monographs-Statistics-Probability/dp/0412280604)). 
 
 This document aims to give an introduction to the challenges posed by
 compositional data produced to assess transcriptomes or microbiomes. I
