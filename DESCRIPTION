@@ -5,11 +5,16 @@ Version: 1.0
 Date: 2018-02-12
 Author: Emanuel Heitlinger  <emanuelheitlinger@gmail.com>
 Maintainer: Emanuel Heitlinger <emanuelheitlinger@gmail.com>
-Description: Distribution of a lecture (please see the vignette)
+Description: This package distributes a contribution to the IZW statistics seminar (Concepts and Computation in Ecology and Evolution [2C2E]) for discussion. 
 License: GPL-3
 RoxygenNote: 6.0.1
 Imports:
-    DESeq2
+    DESeq2,
+    vegan,
+    ALDEx2,
+    pheatmap,
+    reshape,
+    ggplot2
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

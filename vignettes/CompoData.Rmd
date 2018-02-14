@@ -55,13 +55,7 @@ by `DESeq2::makeExampleDESeqDataSet`)
 
 ```{r, echo=FALSE}
 library(ggplot2)
-library(RColorBrewer)
 theme_set(theme_bw())
-ggplot <- function(...) {
-    ggplot2::ggplot(...) +
-        scale_color_brewer(palette="Spectral") +
-        scale_fill_brewer(palette="Spectral")
-}
 ```
 
 
@@ -240,6 +234,7 @@ cases more species than sites and do it the other way round (at least
 I do).
 
 ```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4}
+library(vegan)
 countData.rare <- lapply(1:100, function (i){
     t(rrarefy(t(countData),
               sample=min(ColS$sample.sum)))
@@ -258,7 +253,7 @@ rich.mat <- matrix(unlist(richness), nrow=m)
 
 richness <- data.frame(planet=colData$planet,
                        richness.mean=rowMeans(rich.mat),
-                       richness.sd=rowSds(rich.mat),
+                       richness.sd=apply(rich.mat, 1, sd),
                        n=1:nrow(rich.mat))
 
 ggplot(richness, aes(as.character(n), richness.mean)) +
@@ -296,11 +291,6 @@ pheatmap(countData.clr,
 
 countData.clrP <- aldex.clr(countData,
                             conds=as.character(colData$planet))
-
-pheatmap(countData.clrP@analysisData,
-         annotation_col=colData,
-         show_rownames=FALSE,
-         show_colnames=FALSE)
 
 
 ```
