@@ -273,12 +273,8 @@ richness &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
 
 <span class="kw">mode</span>(countData) &lt;-<span class="st"> "integer"</span>
 
-rowRanges &lt;-<span class="st"> </span><span class="kw">GRanges</span>(<span class="st">"1"</span>, <span class="kw">IRanges</span>(<span class="dt">start =</span> (<span class="dv">1</span>:<span class="kw">nrow</span>(countData) -<span class="st"> </span><span class="dv">1</span>) *<span class="st"> </span><span class="dv">100</span> +<span class="st"> </span><span class="dv">1</span>,
-                                  <span class="dt">width =</span> <span class="dv">100</span>))
-
 dds &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/DESeqDataSet">DESeqDataSetFromMatrix</a></span>(<span class="dt">countData =</span> countData, <span class="dt">colData =</span> colData, 
-                              <span class="dt">design =</span> ~planet, <span class="dt">rowRanges =</span> rowRanges,
-                              <span class="dt">ignoreRank =</span> <span class="ot">TRUE</span>)
+                              <span class="dt">design =</span> ~planet)
 
 dds &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/DESeq2/topics/estimateSizeFactors">estimateSizeFactors</a></span>(dds, <span class="dt">type=</span><span class="st">"poscounts"</span>)
 
@@ -363,7 +359,7 @@ res.aldex &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 <div id="so-what-could-it-be-good-for" class="section level3">
 <h3 class="hasAnchor">
 <a href="#so-what-could-it-be-good-for" class="anchor"></a>So what could it be good for</h3>
-<p>MY guess: correlation between samples</p>
+<p>My guess: correlation within samples.</p>
 <blockquote>
 <p>To be continued.</p>
 </blockquote>

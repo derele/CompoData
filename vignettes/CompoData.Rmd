@@ -310,12 +310,8 @@ library(DESeq2)
 
 mode(countData) <- "integer"
 
-rowRanges <- GRanges("1", IRanges(start = (1:nrow(countData) - 1) * 100 + 1,
-                                  width = 100))
-
 dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData, 
-                              design = ~planet, rowRanges = rowRanges,
-                              ignoreRank = TRUE)
+                              design = ~planet)
 
 dds <- estimateSizeFactors(dds, type="poscounts")
 
@@ -383,7 +379,7 @@ multiple-testing adjusted p-values.
 
 ### So what could it be good for
 
-MY guess: correlation between samples 
+My guess: correlation within samples. 
 
 
 
