@@ -68,7 +68,7 @@
 <div id="e-g-in-microbiomes-or-transcriptomes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#e-g-in-microbiomes-or-transcriptomes" class="anchor"></a>(e.g. in microbiomes or transcriptomes)</h2>
-<p>Standard analyses of abundance estimates genereated from sequencing treat the generated data as counts. Methods for differential abundance estimation in RNAseq data have probably recieved most attention in this regard (<a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">see e.g. this for one of the current approaches</a>). Many (if not all) of the methods developed for analyses of count data derived from transcriptomes are also applied to amplicon sequencing data. On the other hand techniques from classical community ecolgy are applied on data from transcriptomics or amplicon sequencing alike (mostly after <em>transforming</em> it to count data).</p>
+<p>Standard analyses of abundance estimates genereated from sequencing treat the generated data as counts. Methods for differential abundance estimation in RNAseq data have probably recieved most attention in this regard (<a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">see e.g. this for one of the current approaches</a>). Many (if not all) of the methods developed for analyses of count data derived from transcriptomes are also applied to amplicon sequencing data. On the other hand techniques from classical community ecology are applied on data from transcriptomics or amplicon sequencing alike (mostly after <em>transforming</em> it to count data).</p>
 <p>In the field of amplicon sequencing there are currently concernes that analysis of “compositional data” as counts can introduce biases (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/">e.g. reviewd here</a>, refering in its core to <a href="https://www.amazon.de/Statistical-Compositional-Monographs-Statistics-Probability/dp/0412280604">Aitchison, J. (1986)</a>).</p>
 <p>This document aims to give an introduction to the challenges that are posed by compositional data produced to assess transcriptomes via RNAseq or microbiomes via amplicon sequencing. I will give an “abstract” introduction into:</p>
 <ol style="list-style-type: decimal">
@@ -256,12 +256,23 @@ rich.mat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span clas
 richness &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">planet=</span>colData$planet,
                        <span class="dt">richness.mean=</span><span class="kw">rowMeans</span>(rich.mat),
                        <span class="dt">richness.sd=</span><span class="kw">apply</span>(rich.mat, <span class="dv">1</span>, sd),
-                       <span class="dt">n=</span><span class="dv">1</span>:<span class="kw">nrow</span>(rich.mat))
+                       <span class="dt">n=</span><span class="dv">1</span>:<span class="kw">nrow</span>(rich.mat),
+                       <span class="dt">method=</span><span class="st">"rarefied"</span>)
 
-<span class="kw">ggplot</span>(richness, <span class="kw">aes</span>(<span class="kw">as.character</span>(n), richness.mean)) +
+richness.plain &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">planet=</span>colData$planet,
+                       <span class="dt">richness.mean=</span><span class="kw">colSums</span>(countData&gt;<span class="dv">0</span>), 
+                       <span class="dt">richness.sd=</span><span class="dv">0</span>,
+                       <span class="dt">n=</span><span class="dv">1</span>:<span class="kw">nrow</span>(rich.mat),
+                       <span class="dt">method=</span><span class="st">"truth"</span>)
+
+richness &lt;-<span class="st"> </span><span class="kw">rbind</span>(richness, richness.plain)
+
+<span class="kw">ggplot</span>(richness, <span class="kw">aes</span>(<span class="kw">as.character</span>(n), richness.mean, <span class="dt">color=</span>method)) +
 <span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">2</span>) +
 <span class="st">    </span><span class="kw">geom_errorbar</span>(<span class="kw">aes</span>(<span class="dt">ymin=</span>richness.mean-richness.sd,
-                      <span class="dt">ymax=</span>richness.mean+richness.sd))+
+                      <span class="dt">ymax=</span>richness.mean+richness.sd)) +
+<span class="st">    </span><span class="kw">scale_x_discrete</span>(<span class="st">"sample"</span>) +
+<span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="st">"number of species counted"</span>) +
 <span class="st">    </span><span class="kw">facet_wrap</span>(~planet, <span class="dt">scales=</span><span class="st">"free_x"</span>)</code></pre></div>
 <p><img src="CompoData_files/figure-html/unnamed-chunk-6-1.png" width="384"><img src="CompoData_files/figure-html/unnamed-chunk-6-2.png" width="384"></p>
 <p>Uh, we are screwed again!</p>
@@ -347,6 +358,63 @@ res.aldex &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdo
 <p><img src="CompoData_files/figure-html/unnamed-chunk-8-1.png" width="384"></p>
 <p>The problem here is that the neither the geometric mean nor the log can be calculated for zero-count samples. After our naive solution (adding a small number) we used a package which “converts the single estimate to a probability vector”. This uses Monte-Carlo sampling from the Dirichlet distribution (<a href="https://doi.org/10.17713/ajs.v45i4.122">ref</a>).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res &lt;-<span class="st"> </span><span class="kw">merge</span>(res.aldex, <span class="kw">as.data.frame</span>(res.deseq), <span class="dt">by=</span><span class="dv">0</span>)
+<span class="co">#&gt; Loading required package: DESeq2</span>
+<span class="co">#&gt; Loading required package: S4Vectors</span>
+<span class="co">#&gt; Loading required package: stats4</span>
+<span class="co">#&gt; Loading required package: BiocGenerics</span>
+<span class="co">#&gt; Loading required package: parallel</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'BiocGenerics'</span>
+<span class="co">#&gt; The following objects are masked from 'package:parallel':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,</span>
+<span class="co">#&gt;     clusterExport, clusterMap, parApply, parCapply, parLapply,</span>
+<span class="co">#&gt;     parLapplyLB, parRapply, parSapply, parSapplyLB</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     IQR, mad, sd, var, xtabs</span>
+<span class="co">#&gt; The following objects are masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     anyDuplicated, append, as.data.frame, cbind, colMeans,</span>
+<span class="co">#&gt;     colnames, colSums, do.call, duplicated, eval, evalq, Filter,</span>
+<span class="co">#&gt;     Find, get, grep, grepl, intersect, is.unsorted, lapply,</span>
+<span class="co">#&gt;     lengths, Map, mapply, match, mget, order, paste, pmax,</span>
+<span class="co">#&gt;     pmax.int, pmin, pmin.int, Position, rank, rbind, Reduce,</span>
+<span class="co">#&gt;     rowMeans, rownames, rowSums, sapply, setdiff, sort, table,</span>
+<span class="co">#&gt;     tapply, union, unique, unsplit, which, which.max, which.min</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'S4Vectors'</span>
+<span class="co">#&gt; The following objects are masked from 'package:reshape':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     expand, rename</span>
+<span class="co">#&gt; The following object is masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     expand.grid</span>
+<span class="co">#&gt; Loading required package: IRanges</span>
+<span class="co">#&gt; Loading required package: GenomicRanges</span>
+<span class="co">#&gt; Loading required package: GenomeInfoDb</span>
+<span class="co">#&gt; Loading required package: SummarizedExperiment</span>
+<span class="co">#&gt; Loading required package: Biobase</span>
+<span class="co">#&gt; Welcome to Bioconductor</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     Vignettes contain introductory material; view with</span>
+<span class="co">#&gt;     'browseVignettes()'. To cite Bioconductor, see</span>
+<span class="co">#&gt;     'citation("Biobase")', and for packages 'citation("pkgname")'.</span>
+<span class="co">#&gt; Loading required package: DelayedArray</span>
+<span class="co">#&gt; Loading required package: matrixStats</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'matrixStats'</span>
+<span class="co">#&gt; The following objects are masked from 'package:Biobase':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     anyMissing, rowMedians</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'DelayedArray'</span>
+<span class="co">#&gt; The following objects are masked from 'package:matrixStats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges</span>
+<span class="co">#&gt; The following object is masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     apply</span>
 
 <span class="kw">ggplot</span>(res, <span class="kw">aes</span>(glm.eBH, padj)) +
 <span class="st">    </span><span class="kw">geom_point</span>() +

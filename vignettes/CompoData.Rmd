@@ -28,7 +28,7 @@ this regard
 ([see e.g. this for one of the current approaches](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8)). Many
 (if not all) of the methods developed for analyses of count data
 derived from transcriptomes are also applied to amplicon sequencing
-data. On the other hand techniques from classical community ecolgy are
+data. On the other hand techniques from classical community ecology are
 applied on data from transcriptomics or amplicon sequencing alike
 (mostly after _transforming_ it to count data). 
 
@@ -292,12 +292,23 @@ rich.mat <- matrix(unlist(richness), nrow=m)
 richness <- data.frame(planet=colData$planet,
                        richness.mean=rowMeans(rich.mat),
                        richness.sd=apply(rich.mat, 1, sd),
-                       n=1:nrow(rich.mat))
+                       n=1:nrow(rich.mat),
+                       method="rarefied")
 
-ggplot(richness, aes(as.character(n), richness.mean)) +
+richness.plain <- data.frame(planet=colData$planet,
+                       richness.mean=colSums(countData>0), 
+                       richness.sd=0,
+                       n=1:nrow(rich.mat),
+                       method="truth")
+
+richness <- rbind(richness, richness.plain)
+
+ggplot(richness, aes(as.character(n), richness.mean, color=method)) +
     geom_point(size=2) +
     geom_errorbar(aes(ymin=richness.mean-richness.sd,
-                      ymax=richness.mean+richness.sd))+
+                      ymax=richness.mean+richness.sd)) +
+    scale_x_discrete("sample") +
+    scale_y_continuous("number of species counted") +
     facet_wrap(~planet, scales="free_x")
 ```
 
