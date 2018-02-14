@@ -7,6 +7,6 @@ To see this content locally
 
 ```S
 require(devtools)
-devtools::insatll_github("derele/CompoData")
+devtools::install_github("derele/CompoData", build_vignettes=TRUE)
 vignette("CompoData")
 ```
