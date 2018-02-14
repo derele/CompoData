@@ -6,7 +6,10 @@ Date: 2018-02-12
 Authors@R: person("Emanuel", "Heitlinger", role = c("aut", "cre"),
            email = "emanuelheitlinger@gmail.com")
 Maintainer: Emanuel Heitlinger <emanuelheitlinger@gmail.com>
-Description: This package distributes a contribution to the IZW statistics seminar (Concepts and Computation in Ecology and Evolution [2C2E]) for discussion. 
+Description: This package distributes a contribution to the IZW statistics seminar (Concepts and Computation in Ecology and Evolution [2C2E]) for discussion.
+biocViews: Metagenomics,  Genetics, Sequencing, Microbiome,
+    Metagenomics, Clustering, Classification, MultipleComparison,
+    GeneticVariability
 License: GPL-3
 RoxygenNote: 6.0.1
 Imports:

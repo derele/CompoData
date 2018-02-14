@@ -33,22 +33,27 @@ applied on data from transcriptomics or amplicon sequencing alike
 In the field of amplicon sequencing there are currently concernes that
 analysis of "compositional data" as counts can introduce biases ([e.g. reviewd here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5695134/), refering in its core to [Aitchison, J. (1986)](https://www.amazon.de/Statistical-Compositional-Monographs-Statistics-Probability/dp/0412280604)). 
 
-This document aims to give an introduction to the challenges posed by
-compositional data produced to assess transcriptomes or microbiomes. I
-will give an "abstract" introduction into:
+This document aims to give an introduction to the challenges that are
+posed by compositional data produced to assess transcriptomes via
+RNAseq or microbiomes via amplicon sequencing. I will give an
+"abstract" introduction into:
 
-1. pecularities of "compositional count data" from sequencing, 
+1. pecularities of "compositional count data" from sequencing,
 
 and show
 
-2. how analyses of community ecology (try to) deal with these. 
+2. how analyses of community ecology (try to) deal with these (or
+   not).
 
 The main purpose is to discuss with the audience how concepts in
 community ecology and data analyses are affected by the nature of
-sequencing data.
+sequencing data and I want to discuss
 
-It is distributed and "developed" as a package to ease further
-expansion and contribution
+3. whether it is even conceptually possible to address these issues
+   using generic solutions.
+
+This is distributed and "developed" as a package to ease further
+expansion and contribution. 
 
 ## So what is this "compositional data"?
 
@@ -94,11 +99,18 @@ ggplot(melt(countData),
     geom_col()
 ```
 
-In addition our sampling of the starting molecules usually varies in
-depth. A usual first step in all analyses is to account for this
-variation in sampling depths. Standard (presented below) methods
-don't consider the compositional nature of sequencing data when dong
-so.
+These values (given how we simulated them) could now be the actual
+counts of our animals on those planets. The problem is: when
+sequencing we don't know. PCRs in the preparation of libraries
+(collections of DNA molecules) perserve the relative proportions of
+different molecules (say those from tigers, unicorns and ladybugs) but
+provide no information on the number before amplification.
+
+In addition, our sampling of the finally produced molecules usually
+varies in depth (that is sequencing depth varies). A usual first step
+in all analyses is to account for this variation in sampling
+depths. Standard (presented below) methods don't consider the
+compositional nature of sequencing data when dong so.
 
 
 ```{r, fig.show='hold', fig.height=4, fig.width=4}
@@ -130,7 +142,8 @@ ggplot(melt(t(t(countData)*1/scaling.factor)),
 
 ## Interlude: A more realistic dataset
 
-We adjust a couple of things in our dataset to make it more realistic:
+We now adjust a couple of things in our dataset to make it more
+realistic:
 
 1. We add more species (rows, could also be genes in trascriptomics)
 
@@ -205,6 +218,14 @@ pheatmap(log10(countData+1),
          show_colnames=FALSE)
 ```
 
+I aimed for a simulation of a dataset which resembles more amplicon
+sequencing as compred to RNAseq. These datasets are usually sparse,
+meaning many species have in many samples zero counts. Mean values of
+a negative binomial distribution for individual species are themselfs
+normally distributed. These mean values are low but have a high
+variance. To differenciate the different ecosystems I used differences
+in the mean which are normally distibuted with a mean of zero.
+
 ## Scaling by totals (2, slightly more realistic data)
 
 ```{r, results='as.is', fig.height=4, fig.show='hold', fig.width=4}
@@ -224,6 +245,9 @@ pheatmap(log10(countData.scaled+1),
          show_rownames=FALSE,
          show_colnames=FALSE)
 ```
+
+This lead to a dataset in which the total number of animals varied a
+lot with the 
 
 Interestingly, scaleing by totals seems to screw us over here. We did
 not include sequencing depth differnences in this simulation, so we
