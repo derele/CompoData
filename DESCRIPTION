@@ -3,7 +3,8 @@ Type: Package
 Title: A lecture on sequence count data
 Version: 1.0
 Date: 2018-02-12
-Author: Emanuel Heitlinger  <emanuelheitlinger@gmail.com>
+Authors@R: person("Emanuel", "Heitlinger", role = c("aut", "cre"),
+           email = "emanuelheitlinger@gmail.com")
 Maintainer: Emanuel Heitlinger <emanuelheitlinger@gmail.com>
 Description: This package distributes a contribution to the IZW statistics seminar (Concepts and Computation in Ecology and Evolution [2C2E]) for discussion. 
 License: GPL-3
