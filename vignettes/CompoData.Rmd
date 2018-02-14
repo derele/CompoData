@@ -278,11 +278,6 @@ countData.rare <- lapply(1:100, function (i){
               sample=min(ColS$sample.sum)))
 })
 
-pheatmap(log10(countData.rare[[1]]+1),
-         annotation_col=colData,
-         show_rownames=FALSE,
-         show_colnames=FALSE)
-
 richness <- lapply(countData.rare, function(y){
     apply(y, 2, function(x) length(x[x>0]))
 })
@@ -353,11 +348,6 @@ g.mean <- function (x, na.rm=TRUE){
 countData.clr <- apply(countData, 2, function(x){
     log(x+0.0001/g.mean(x+0.0001))
 })
-
-pheatmap(countData.clr,
-         annotation_col=colData,
-         show_rownames=FALSE,
-         show_colnames=FALSE)
 
 countData.clrP <- aldex.clr(countData,
                             conds=as.character(colData$planet))
